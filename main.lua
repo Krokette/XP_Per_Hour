@@ -7,6 +7,7 @@ local no_data = "0 XP per hour"
 -- State
 local state = {}
 state.is_started = false
+state.is_paused = false
 
 -- Create addon UI
 local function create_ui()
@@ -38,6 +39,7 @@ local function create_ui()
     local fns = {}
     fns.start_handler = function(self)
         state.is_started = true
+        state.is_paused = false  -- Reset pause state when starting
         -- Clear XP state
         state.flush_xp_gain(state)
         -- Attach OnUpdate handler
@@ -48,6 +50,7 @@ local function create_ui()
     end
     fns.stop_handler = function(self)
         state.is_started = false
+        
         -- Remove OnUpdate handler
         state.event_frame:SetScript("OnUpdate", nil)
         display_string:SetText(stopped)
@@ -77,6 +80,28 @@ local function create_ui()
             state.flush_xp_gain(state)
         end
     end)
+
+    --pause button
+    local button_pause = CreateFrame("Button", nil, display_frame, bt)
+    button_pause:SetPoint("LEFT", button_flush, "RIGHT", 4, 0)
+    button_pause:SetSize(60, 20)
+    button_pause:SetScale(0.7)
+    button_pause:SetText("Pause")
+    button_pause:SetScript("OnClick", function(self)
+        if state.is_started then
+            state.is_paused = not state.is_paused
+            if state.is_paused then
+                -- Pause button clicked, update UI and stop updating XP
+                state.display_string:SetText("Paused")
+                state.event_frame:SetScript("OnUpdate", nil)
+            else
+                -- Resume button clicked, update UI and resume updating XP
+                state.display_string:SetText(Round(state.xp_per_hour) .. " XP per hour")
+                state.event_frame:SetScript("OnUpdate", state.on_update_handler)
+            end
+        end
+    end)
+    --
 end
 
 -- XP functions
