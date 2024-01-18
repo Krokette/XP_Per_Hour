@@ -1,0 +1,9 @@
+## Interface: 30300
+## Title: XP Per Hour (wotlk update)
+## Notes: Tracks and displays XP per hour
+## Author: Kr0kette
+## Version: 0.2.0
+## DefaultState: Enabled
+## SavedVariables: XP_Per_Hour_Position
+
+main.lua
